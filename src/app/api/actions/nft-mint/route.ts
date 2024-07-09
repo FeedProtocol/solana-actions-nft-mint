@@ -239,15 +239,9 @@ export const POST = async (req: Request) => {
       throw `account may not be rent exempt: ${toPubkey.toBase58()}`;
     }
 
-    const transaction = new Transaction();
+    const transaction = getTransaction(account,toPubkey,amount)
 
-    transaction.add(
-      SystemProgram.transfer({
-        fromPubkey: account,
-        toPubkey: toPubkey,
-        lamports: amount * LAMPORTS_PER_SOL,
-      }),
-    );
+
 
     // set the end user as the fee payer
     transaction.feePayer = account;
@@ -308,4 +302,19 @@ function validatedQueryParams(requestUrl: URL) {
     amount,
     toPubkey,
   };
+}
+
+function getTransaction(account:PublicKey,toPubkey:PublicKey,amount:number){
+
+  const tx = new Transaction();
+  
+  tx.add(
+    SystemProgram.transfer({
+      fromPubkey: account,
+      toPubkey: toPubkey,
+      lamports: amount * LAMPORTS_PER_SOL,
+    }),
+  );
+
+  return tx;
 }
