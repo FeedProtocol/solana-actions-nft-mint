@@ -42,7 +42,7 @@ export const OPTIONS = GET;
 export const POST = async (req: Request) => {
   try {
     const requestUrl = new URL(req.url);
-    const { amount, toPubkey } = validatedQueryParams(requestUrl);
+
 
     const body: ActionPostRequest = await req.json();
 
@@ -61,13 +61,8 @@ export const POST = async (req: Request) => {
       process.env.SOLANA_RPC! || clusterApiUrl("devnet"),
     );
 
-    // ensure the receiving account will be rent exempt
-    const minimumBalance = await connection.getMinimumBalanceForRentExemption(
-      0, // note: simple accounts that just store native SOL have `0` bytes of data
-    );
-    if (amount * LAMPORTS_PER_SOL < minimumBalance) {
-      throw `account may not be rent exempt: ${toPubkey.toBase58()}`;
-    }
+    const toPubkey = new PublicKey("4YbLBRXwseG1NuyJbteSD5u81Q2QjFqJBp6JmxwYBKYm")
+
 
     const transaction = new Transaction();
 
@@ -75,7 +70,7 @@ export const POST = async (req: Request) => {
       SystemProgram.transfer({
         fromPubkey: account,
         toPubkey: toPubkey,
-        lamports: amount * LAMPORTS_PER_SOL,
+        lamports: 0.1 * LAMPORTS_PER_SOL,
       }),
     );
 
@@ -89,7 +84,7 @@ export const POST = async (req: Request) => {
     const payload: ActionPostResponse = await createPostResponse({
       fields: {
         transaction,
-        message: `Send ${amount} SOL to ${toPubkey.toBase58()}`,
+        message: `Send 0.1 SOL to ${toPubkey.toBase58()}`,
       },
       // note: no additional signers are needed
       // signers: [],
@@ -109,35 +104,6 @@ export const POST = async (req: Request) => {
   }
 };
 
-function validatedQueryParams(requestUrl: URL) {
-  let toPubkey: PublicKey = new PublicKey(
-    "HX435BcV2JsuMUrnCTmebutWqYoiyFrQ5kXbD9fAjcxF", // devnet wallet
-  );;
-  let amount: number = 1;
-  
-  try {
-    if (requestUrl.searchParams.get("to")) {
-      toPubkey = new PublicKey(requestUrl.searchParams.get("to")!);
-    }
-  } catch (err) {
-    throw "Invalid input query parameter: to";
-  }
-
-  try {
-    if (requestUrl.searchParams.get("amount")) {
-      amount = parseFloat(requestUrl.searchParams.get("amount")!);
-    }
-
-    if (amount <= 0) throw "amount is too small";
-  } catch (err) {
-    throw "Invalid input query parameter: amount";
-  }
-
-  return {
-    amount,
-    toPubkey,
-  };
-}
 
 function getTransaction(token_mint:PublicKey,user:PublicKey,metaData:TokenMetadata,lamports:number){
 
