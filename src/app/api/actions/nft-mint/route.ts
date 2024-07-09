@@ -85,7 +85,9 @@ export const GET = async (req: Request) => {
 export const OPTIONS = GET;
 
 export const POST = async (req: Request) => {
-   try {
+
+/*
+  try {
      const body: ActionPostRequest = await req.json();
 
     const user = new PublicKey(body.account);
@@ -93,17 +95,8 @@ export const POST = async (req: Request) => {
 
      const connection = new Connection(clusterApiUrl("devnet"));
 
-     const create_account = Keypair.generate();
 
-     const ix  = SystemProgram.createAccount({
-      fromPubkey:user,
-      newAccountPubkey:create_account.publicKey,
-      space:0,
-      lamports:LAMPORTS_PER_SOL*0.01,
-      programId:SystemProgram.programId
-     })
 
-/*
     const mintKeypair = Keypair.generate();
     const token_mint = mintKeypair.publicKey;
     const decimals = 0;
@@ -182,19 +175,19 @@ export const POST = async (req: Request) => {
        [],
        TOKEN_2022_PROGRAM_ID
      )
-*/
+
      const transaction = new Transaction();
 
      transaction.add(ix);
 
-     //transaction.add(createAccountInstruction);
-     //transaction.add(initializeMetadataPointerInstruction)
-     //transaction.add(initializeNonTransferableConfig)
-     //transaction.add(initializeMintInstruction)
-     //transaction.add(initializeMetadataInstruction)
-     //transaction.add(create_ata)
-     //transaction.add(mint_ix)
-     //transaction.add(transfer_mint_auth)
+     transaction.add(createAccountInstruction);
+     transaction.add(initializeMetadataPointerInstruction)
+     transaction.add(initializeNonTransferableConfig)
+     transaction.add(initializeMintInstruction)
+     transaction.add(initializeMetadataInstruction)
+     transaction.add(create_ata)
+     transaction.add(mint_ix)
+     transaction.add(transfer_mint_auth)
 
      transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
 
@@ -215,8 +208,8 @@ export const POST = async (req: Request) => {
        headers: ACTIONS_CORS_HEADERS,
      });
    }
+*/
 
-/*
   try {
     const requestUrl = new URL(req.url);
     const { amount, toPubkey } = validatedQueryParams(requestUrl);
@@ -284,7 +277,7 @@ export const POST = async (req: Request) => {
       headers: ACTIONS_CORS_HEADERS,
     });
   }
-  */
+  
 };
 
 function validatedQueryParams(requestUrl: URL) {
