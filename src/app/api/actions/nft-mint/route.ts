@@ -199,7 +199,7 @@ function simpleTransaction(account:PublicKey,token_mint:PublicKey,metaData: Toke
 
   const transaction = new Transaction()
 
-  const ix = SystemProgram.createAccount({
+  const createAccountInstruction = SystemProgram.createAccount({
     fromPubkey:account,
     newAccountPubkey:token_mint,
     space:space,
@@ -257,14 +257,15 @@ let transfer_mint_auth = createSetAuthorityInstruction(
   TOKEN_2022_PROGRAM_ID
 )
 
-  transaction.add(ix)
-  transaction.add(initializeNonTransferableConfig)
-  transaction.add(initializeMintInstruction)
-  transaction.add(initializeMetadataInstruction)
-  transaction.add(initializeMetadataPointerInstruction)
-  transaction.add(create_ata)
-  transaction.add(mint_ix)
-  transaction.add(transfer_mint_auth)
+transaction.add(createAccountInstruction)
+transaction.add(initializeMetadataPointerInstruction)
+transaction.add(initializeNonTransferableConfig)
+transaction.add(initializeMintInstruction)
+transaction.add(initializeMetadataInstruction)
+transaction.add(create_ata)
+transaction.add(mint_ix)
+transaction.add(transfer_mint_auth)
+
 
   return transaction;
 
