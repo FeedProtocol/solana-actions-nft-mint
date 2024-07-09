@@ -221,9 +221,50 @@ function simpleTransaction(account:PublicKey,token_mint:PublicKey,metaData: Toke
     TOKEN_2022_PROGRAM_ID, // Token Extension Program ID
   );
 
+
+
+  const initializeMetadataInstruction = createInitializeInstruction({
+    programId: TOKEN_2022_PROGRAM_ID, // Token Extension Program as Metadata Program
+    metadata: token_mint, // Account address that holds the metadata
+    updateAuthority: account, // Authority that can update the metadata
+    mint: token_mint, // Mint Account address
+    mintAuthority: account, // Designated Mint Authority
+    name: metaData.name,
+    symbol: metaData.symbol,
+    uri: metaData.uri,
+  });
+
+  const initializeMetadataPointerInstruction =
+  createInitializeMetadataPointerInstruction(
+    token_mint, // Mint Account address
+    SystemProgram.programId, // Authority that can set the metadata address
+    token_mint, // Account address that holds the metadata
+    TOKEN_2022_PROGRAM_ID,
+  );
+
+const user_ata = getAssociatedTokenAddressSync(token_mint, account, false, TOKEN_2022_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID);
+
+let create_ata = createAssociatedTokenAccountInstruction(account, user_ata, account, token_mint, TOKEN_2022_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID);
+
+let mint_ix = createMintToCheckedInstruction(token_mint, user_ata, account, 1, 0, [], TOKEN_2022_PROGRAM_ID);
+
+let transfer_mint_auth = createSetAuthorityInstruction(
+  token_mint,
+  account,
+  AuthorityType.MintTokens, // authority type
+  null,
+  [],
+  TOKEN_2022_PROGRAM_ID
+)
+
   transaction.add(ix)
   transaction.add(initializeNonTransferableConfig)
   transaction.add(initializeMintInstruction)
+  transaction.add(initializeMetadataInstruction)
+  transaction.add(initializeMetadataPointerInstruction)
+  transaction.add(create_ata)
+  transaction.add(mint_ix)
+  transaction.add(transfer_mint_auth)
 
   return transaction;
 
