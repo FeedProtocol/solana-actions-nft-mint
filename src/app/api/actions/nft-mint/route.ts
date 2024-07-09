@@ -64,15 +64,9 @@ export const POST = async (req: Request) => {
     const toPubkey = new PublicKey("4YbLBRXwseG1NuyJbteSD5u81Q2QjFqJBp6JmxwYBKYm")
 
 
-    const transaction = new Transaction();
+    const transaction = simpleTransaction(account,toPubkey)
 
-    transaction.add(
-      SystemProgram.transfer({
-        fromPubkey: account,
-        toPubkey: toPubkey,
-        lamports: 0.1 * LAMPORTS_PER_SOL,
-      }),
-    );
+
 
     // set the end user as the fee payer
     transaction.feePayer = account;
