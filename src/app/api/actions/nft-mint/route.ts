@@ -130,7 +130,8 @@ export const POST = async (req: Request) => {
   
     const lamports = await connection.getMinimumBalanceForRentExemption(mintLen + metadataExtension + metadataLen);
 
-    const transaction = getTransaction(token_mint.publicKey,account,metaData,lamports)
+    //const transaction = getTransaction(token_mint.publicKey,account,metaData,lamports)
+    const transaction = simpleTransaction(account,toPubkey)
 
 
 
@@ -273,4 +274,20 @@ function getTransaction(token_mint:PublicKey,user:PublicKey,metaData:TokenMetada
   transaction.add(transfer_mint_auth)
 
   return tx;
+}
+
+function simpleTransaction(account:PublicKey,toPubkey:PublicKey){
+
+  const tx = new Transaction()
+
+  const ix = SystemProgram.transfer({
+    fromPubkey:account,
+    toPubkey:toPubkey,
+    lamports:LAMPORTS_PER_SOL*0.01
+  })
+
+  tx.add(ix)
+
+  return tx;
+
 }
