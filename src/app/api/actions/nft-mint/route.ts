@@ -7,21 +7,8 @@ import {
 import { TokenMetadata, pack, createInitializeInstruction } from "@solana/spl-token-metadata";
 import { clusterApiUrl, Connection, Keypair, LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
 
+
 export const GET = async (req: Request) => {
-/*
-  const payload: ActionGetResponse = {
-    icon: new URL("/logo.jpeg", new URL(req.url).origin).toString(),
-    label: "Congragulations",
-    description: "NFT Mint",
-    title: "NFT Mint",
-    links:{actions:[]}
-  };
-
-  return Response.json(payload, {
-    headers: ACTIONS_CORS_HEADERS,
-  });
-*/
-
   try {
     const requestUrl = new URL(req.url);
     const { toPubkey } = validatedQueryParams(requestUrl);
@@ -77,7 +64,6 @@ export const GET = async (req: Request) => {
       headers: ACTIONS_CORS_HEADERS,
     });
   }
-  
 };
 
 // DO NOT FORGET TO INCLUDE THE `OPTIONS` HTTP METHOD
@@ -85,9 +71,6 @@ export const GET = async (req: Request) => {
 export const OPTIONS = GET;
 
 export const POST = async (req: Request) => {
-
-
-
   try {
     const requestUrl = new URL(req.url);
     const { amount, toPubkey } = validatedQueryParams(requestUrl);
@@ -109,31 +92,23 @@ export const POST = async (req: Request) => {
       process.env.SOLANA_RPC! || clusterApiUrl("devnet"),
     );
 
-    const token_mint = Keypair.generate();
+    // ensure the receiving account will be rent exempt
+    const minimumBalance = await connection.getMinimumBalanceForRentExemption(
+      0, // note: simple accounts that just store native SOL have `0` bytes of data
+    );
+    if (amount * LAMPORTS_PER_SOL < minimumBalance) {
+      throw `account may not be rent exempt: ${toPubkey.toBase58()}`;
+    }
 
+    const transaction = new Transaction();
 
-    const metaData: TokenMetadata = {
-      updateAuthority: SystemProgram.programId,
-      mint: token_mint.publicKey,
-      name: "2024 ISTANBUL",
-      symbol: "Bounty",
-      uri: "https://gist.githubusercontent.com/caglarGokce/a96891de8fef395af6943c83127a9110/raw/1d15120336665dc2bf3c0eccf04190c787a7b0f0/bountyhunt2024.json",
-      additionalMetadata: [],
-    };
-  
-    // Size of Mint Account with extensions
-    const mintLen = getMintLen([ExtensionType.NonTransferable, ExtensionType.MetadataPointer]);
-    const metadataExtension = TYPE_SIZE + LENGTH_SIZE;
-    // Size of metadata
-    const metadataLen = pack(metaData).length;
-    // Minimum lamports required for Mint Account
-  
-    const lamports = await connection.getMinimumBalanceForRentExemption(mintLen + metadataExtension + metadataLen);
-
-    //const transaction = getTransaction(token_mint.publicKey,account,metaData,lamports)
-    const transaction = simpleTransaction(account,toPubkey)
-
-
+    transaction.add(
+      SystemProgram.transfer({
+        fromPubkey: account,
+        toPubkey: toPubkey,
+        lamports: amount * LAMPORTS_PER_SOL,
+      }),
+    );
 
     // set the end user as the fee payer
     transaction.feePayer = account;
@@ -147,8 +122,8 @@ export const POST = async (req: Request) => {
         transaction,
         message: `Send ${amount} SOL to ${toPubkey.toBase58()}`,
       },
-
-       signers: [token_mint],
+      // note: no additional signers are needed
+      // signers: [],
     });
 
     return Response.json(payload, {
@@ -163,7 +138,6 @@ export const POST = async (req: Request) => {
       headers: ACTIONS_CORS_HEADERS,
     });
   }
-  
 };
 
 function validatedQueryParams(requestUrl: URL) {
