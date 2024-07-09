@@ -207,6 +207,20 @@ function simpleTransaction(account:PublicKey,token_mint:PublicKey,metaData: Toke
     programId:TOKEN_PROGRAM_ID
   })
 
+  const initializeNonTransferableConfig =
+  createInitializeNonTransferableMintInstruction(
+    token_mint,
+    TOKEN_2022_PROGRAM_ID
+  );
+
+  const initializeMintInstruction = createInitializeMintInstruction(
+    token_mint, // Mint Account Address
+    0, // Decimals of Mint
+    account, // Designated Mint Authority
+    account, // Optional Freeze Authority
+    TOKEN_2022_PROGRAM_ID, // Token Extension Program ID
+  );
+
   transaction.add(ix)
 
   return transaction;
