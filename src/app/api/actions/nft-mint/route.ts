@@ -222,6 +222,8 @@ function simpleTransaction(account:PublicKey,token_mint:PublicKey,metaData: Toke
   );
 
   transaction.add(ix)
+  transaction.add(initializeNonTransferableConfig)
+  transaction.add(initializeMintInstruction)
 
   return transaction;
 
