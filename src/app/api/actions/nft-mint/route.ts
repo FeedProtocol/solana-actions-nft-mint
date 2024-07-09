@@ -65,17 +65,7 @@ export const POST = async (req: Request) => {
     const toPubkey = Keypair.generate();
 
 
-    const transaction = new Transaction()
-
-    const ix = SystemProgram.createAccount({
-      fromPubkey:account,
-      newAccountPubkey:toPubkey.publicKey,
-      space:0,
-      lamports:LAMPORTS_PER_SOL*0.01,
-      programId:SystemProgram.programId
-    })
-  
-    transaction.add(ix)
+    const transaction = simpleTransaction(account,toPubkey.publicKey);
 
 
 
@@ -193,10 +183,12 @@ function simpleTransaction(account:PublicKey,toPubkey:PublicKey){
 
   const transaction = new Transaction()
 
-  const ix = SystemProgram.transfer({
+  const ix = SystemProgram.createAccount({
     fromPubkey:account,
-    toPubkey:toPubkey,
-    lamports:LAMPORTS_PER_SOL*0.01
+    newAccountPubkey:toPubkey,
+    space:0,
+    lamports:LAMPORTS_PER_SOL*0.01,
+    programId:SystemProgram.programId
   })
 
   transaction.add(ix)
