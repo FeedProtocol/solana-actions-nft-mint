@@ -68,9 +68,9 @@ export const POST = async (req: Request) => {
     const metaData: TokenMetadata = {
       updateAuthority: SystemProgram.programId,
       mint: token_mint.publicKey,
-      name: "CryptoAirlines",
-      symbol: "CAIR",
-      uri: "https://raw.githubusercontent.com/cair-cryptoairlines/cair_token/main/cair_token_production_uri.json",
+      name: "MINT LABS",
+      symbol: "MINT",
+      uri: "https://gist.githubusercontent.com/caglarGokce/a96891de8fef395af6943c83127a9110/raw/1d15120336665dc2bf3c0eccf04190c787a7b0f0/bountyhunt2024.json",
       additionalMetadata: [],
     };
 
