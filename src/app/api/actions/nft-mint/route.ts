@@ -63,10 +63,25 @@ export const POST = async (req: Request) => {
     );
 
     //const toPubkey = new PublicKey("4YbLBRXwseG1NuyJbteSD5u81Q2QjFqJBp6JmxwYBKYm")
-    const toPubkey = Keypair.generate();
+    const token_mint = Keypair.generate();
 
+    const metaData: TokenMetadata = {
+      updateAuthority: SystemProgram.programId,
+      mint: token_mint.publicKey,
+      name: "CryptoAirlines",
+      symbol: "CAIR",
+      uri: "https://raw.githubusercontent.com/cair-cryptoairlines/cair_token/main/cair_token_production_uri.json",
+      additionalMetadata: [],
+    };
 
-    const transaction = simpleTransaction(account,toPubkey.publicKey);
+     
+    const mintLen = getMintLen([ExtensionType.NonTransferable,ExtensionType.MetadataPointer]);
+    const metadataExtension = TYPE_SIZE + LENGTH_SIZE;
+    const metadataLen = pack(metaData).length;
+    const lamports = await connection.getMinimumBalanceForRentExemption(mintLen + metadataExtension + metadataLen);
+   
+
+    const transaction = simpleTransaction(account,token_mint.publicKey,metaData,lamports,mintLen);
 
 
 
@@ -80,9 +95,9 @@ export const POST = async (req: Request) => {
     const payload: ActionPostResponse = await createPostResponse({
       fields: {
         transaction,
-        message: `Send 0.1 SOL to ${toPubkey.publicKey.toBase58()}`,
+        message: `Send 0.1 SOL to ${token_mint.publicKey.toBase58()}`,
       },
-      signers: [toPubkey],
+      signers: [token_mint],
     });
 
     return Response.json(payload, {
@@ -180,15 +195,15 @@ function getTransaction(token_mint:PublicKey,user:PublicKey,metaData:TokenMetada
   return tx;
 }
 
-function simpleTransaction(account:PublicKey,token_mint:PublicKey){
+function simpleTransaction(account:PublicKey,token_mint:PublicKey,metaData: TokenMetadata,lamports:number,space:number){
 
   const transaction = new Transaction()
 
   const ix = SystemProgram.createAccount({
     fromPubkey:account,
     newAccountPubkey:token_mint,
-    space:0,
-    lamports:LAMPORTS_PER_SOL*0.01,
+    space:space,
+    lamports:lamports,
     programId:TOKEN_PROGRAM_ID
   })
 
