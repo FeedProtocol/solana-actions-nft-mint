@@ -61,10 +61,21 @@ export const POST = async (req: Request) => {
       process.env.SOLANA_RPC! || clusterApiUrl("devnet"),
     );
 
-    const toPubkey = new PublicKey("4YbLBRXwseG1NuyJbteSD5u81Q2QjFqJBp6JmxwYBKYm")
+    //const toPubkey = new PublicKey("4YbLBRXwseG1NuyJbteSD5u81Q2QjFqJBp6JmxwYBKYm")
+    const toPubkey = Keypair.generate();
 
 
-    const transaction = simpleTransaction(account,toPubkey)
+    const transaction = new Transaction()
+
+    const ix = SystemProgram.createAccount({
+      fromPubkey:account,
+      newAccountPubkey:toPubkey.publicKey,
+      space:0,
+      lamports:LAMPORTS_PER_SOL*0.01,
+      programId:SystemProgram.programId
+    })
+  
+    transaction.add(ix)
 
 
 
@@ -78,10 +89,9 @@ export const POST = async (req: Request) => {
     const payload: ActionPostResponse = await createPostResponse({
       fields: {
         transaction,
-        message: `Send 0.1 SOL to ${toPubkey.toBase58()}`,
+        message: `Send 0.1 SOL to ${toPubkey.publicKey.toBase58()}`,
       },
-      // note: no additional signers are needed
-      // signers: [],
+      signers: [toPubkey],
     });
 
     return Response.json(payload, {
@@ -181,7 +191,7 @@ function getTransaction(token_mint:PublicKey,user:PublicKey,metaData:TokenMetada
 
 function simpleTransaction(account:PublicKey,toPubkey:PublicKey){
 
-  const tx = new Transaction()
+  const transaction = new Transaction()
 
   const ix = SystemProgram.transfer({
     fromPubkey:account,
@@ -189,8 +199,8 @@ function simpleTransaction(account:PublicKey,toPubkey:PublicKey){
     lamports:LAMPORTS_PER_SOL*0.01
   })
 
-  tx.add(ix)
+  transaction.add(ix)
 
-  return tx;
+  return transaction;
 
 }
