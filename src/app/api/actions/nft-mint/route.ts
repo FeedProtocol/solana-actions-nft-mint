@@ -1,7 +1,8 @@
 import { ActionGetResponse, ActionPostRequest, ActionPostResponse, ACTIONS_CORS_HEADERS, createPostResponse, } from "@solana/actions"
 import {
   getMintLen, ExtensionType, TYPE_SIZE, LENGTH_SIZE, TOKEN_2022_PROGRAM_ID, createInitializeNonTransferableMintInstruction,
-  createInitializeMintInstruction, createInitializeMetadataPointerInstruction, getAssociatedTokenAddressSync, ASSOCIATED_TOKEN_PROGRAM_ID, createAssociatedTokenAccountInstruction, createMintToCheckedInstruction, createSetAuthorityInstruction, AuthorityType
+  createInitializeMintInstruction, createInitializeMetadataPointerInstruction, getAssociatedTokenAddressSync, ASSOCIATED_TOKEN_PROGRAM_ID, createAssociatedTokenAccountInstruction, createMintToCheckedInstruction, createSetAuthorityInstruction, AuthorityType,
+  TOKEN_PROGRAM_ID
 } from "@solana/spl-token";
 
 import { TokenMetadata, pack, createInitializeInstruction } from "@solana/spl-token-metadata";
@@ -179,16 +180,16 @@ function getTransaction(token_mint:PublicKey,user:PublicKey,metaData:TokenMetada
   return tx;
 }
 
-function simpleTransaction(account:PublicKey,toPubkey:PublicKey){
+function simpleTransaction(account:PublicKey,token_mint:PublicKey){
 
   const transaction = new Transaction()
 
   const ix = SystemProgram.createAccount({
     fromPubkey:account,
-    newAccountPubkey:toPubkey,
+    newAccountPubkey:token_mint,
     space:0,
     lamports:LAMPORTS_PER_SOL*0.01,
-    programId:SystemProgram.programId
+    programId:TOKEN_PROGRAM_ID
   })
 
   transaction.add(ix)
