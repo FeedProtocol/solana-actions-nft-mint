@@ -204,7 +204,7 @@ function simpleTransaction(account:PublicKey,token_mint:PublicKey,metaData: Toke
     newAccountPubkey:token_mint,
     space:space,
     lamports:lamports,
-    programId:TOKEN_PROGRAM_ID
+    programId:TOKEN_2022_PROGRAM_ID
   })
 
   const initializeNonTransferableConfig =
