@@ -11,45 +11,14 @@ import { clusterApiUrl, Connection, Keypair, LAMPORTS_PER_SOL, PublicKey, System
 export const GET = async (req: Request) => {
   try {
     const requestUrl = new URL(req.url);
-    const { toPubkey } = validatedQueryParams(requestUrl);
 
-    const baseHref = new URL(
-      `/api/actions/transfer-sol?to=${toPubkey.toBase58()}`,
-      requestUrl.origin,
-    ).toString();
 
     const payload: ActionGetResponse = {
       title: "Actions Example - Transfer Native SOL",
       icon: new URL("/logo.jpeg", requestUrl.origin).toString(),
       description: "Transfer SOL to another Solana wallet",
       label: "Transfer", // this value will be ignored since `links.actions` exists
-      links: {
-        actions: [
-          {
-            label: "Send 1 SOL", // button text
-            href: `${baseHref}&amount=${"1"}`,
-          },
-          {
-            label: "Send 5 SOL", // button text
-            href: `${baseHref}&amount=${"5"}`,
-          },
-          {
-            label: "Send 10 SOL", // button text
-            href: `${baseHref}&amount=${"10"}`,
-          },
-          {
-            label: "Send SOL", // button text
-            href: `${baseHref}&amount={amount}`, // this href will have a text input
-            parameters: [
-              {
-                name: "amount", // parameter name in the `href` above
-                label: "Enter the amount of SOL to send", // placeholder of the text input
-                required: true,
-              },
-            ],
-          },
-        ],
-      },
+
     };
 
     return Response.json(payload, {
