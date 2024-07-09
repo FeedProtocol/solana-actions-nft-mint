@@ -8,7 +8,7 @@ import { TokenMetadata, pack, createInitializeInstruction } from "@solana/spl-to
 import { clusterApiUrl, Connection, Keypair, LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
 
 export const GET = async (req: Request) => {
-
+/*
   const payload: ActionGetResponse = {
     icon: new URL("/logo.jpeg", new URL(req.url).origin).toString(),
     label: "Congragulations",
@@ -20,8 +20,8 @@ export const GET = async (req: Request) => {
   return Response.json(payload, {
     headers: ACTIONS_CORS_HEADERS,
   });
+*/
 
-/*
   try {
     const requestUrl = new URL(req.url);
     const { toPubkey } = validatedQueryParams(requestUrl);
@@ -77,7 +77,7 @@ export const GET = async (req: Request) => {
       headers: ACTIONS_CORS_HEADERS,
     });
   }
-  */
+  
 };
 
 // DO NOT FORGET TO INCLUDE THE `OPTIONS` HTTP METHOD
