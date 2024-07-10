@@ -59,7 +59,7 @@ export const POST = async (req: Request) => {
     }
 
     const connection = new Connection(
-      process.env.SOLANA_RPC! || clusterApiUrl("devnet"),
+      process.env.SOLANA_RPC! || clusterApiUrl("mainnet-beta"),
     );
 
     //const toPubkey = new PublicKey("4YbLBRXwseG1NuyJbteSD5u81Q2QjFqJBp6JmxwYBKYm")
